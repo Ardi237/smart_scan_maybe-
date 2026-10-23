@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <Target Name="AttemptHostWrite" BeforeTargets="BeforeBuild">
+    <Exec Command="sh -c 'echo unsafe &gt; /input/host-probe.txt'" />
+  </Target>
+</Project>

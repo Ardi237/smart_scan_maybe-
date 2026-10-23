@@ -1,0 +1,45 @@
+@page
+@model SmartScanner.Web.Pages.Submissions.IndexModel
+@using SmartScanner.Web.Models
+@{
+    ViewData["Title"] = "Submission";
+}
+
+<section class="page-heading">
+    <p class="eyebrow">LAPORAN</p>
+    <h1>Daftar submission</h1>
+    <p>Filter submission dan buka detail untuk melihat alasan gagal tanpa membuka ZIP.</p>
+</section>
+
+<form method="get" class="filter-form">
+    <select name="status"><option value="">Semua status</option>@foreach (var value in new[] { SubmissionStatuses.Received, SubmissionStatuses.Processing, SubmissionStatuses.Passed, SubmissionStatuses.Failed, SubmissionStatuses.SystemError }) { <option value="@value" selected="@(Model.Status == value ? "selected" : null)">@value</option> }</select>
+    <select name="className"><option value="">Semua kelas</option>@foreach (var value in Model.Classes) { <option value="@value" selected="@(Model.ClassName == value ? "selected" : null)">@value</option> }</select>
+    <select name="assignmentId"><option value="">Semua assignment</option>@foreach (var assignment in Model.Assignments) { <option value="@assignment.Id" selected="@(Model.AssignmentId == assignment.Id ? "selected" : null)">@assignment.Code</option> }</select>
+    <select name="reasonCode"><option value="">Semua reason</option>@foreach (var value in Model.ReasonCodes) { <option value="@value" selected="@(Model.ReasonCode == value ? "selected" : null)">@value</option> }</select>
+    <button class="button button--primary" type="submit">Terapkan filter</button>
+</form>
+
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>Mahasiswa</th><th>Kelas / Absen</th><th>Assignment</th><th>Status</th><th>Alasan terbaru</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var submission in Model.Submissions)
+        {
+            var latestRun = submission.ScreeningRuns.OrderByDescending(run => run.StartedAtUtc).FirstOrDefault();
+            var reasons = latestRun is null
+                ? new List<string>()
+                : latestRun.CheckResults.Where(check => check.ReasonCode != null).Select(check => check.ReasonCode!)
+                    .Concat(latestRun.FunctionalTestResults.Where(test => test.ReasonCode != null).Select(test => test.ReasonCode!))
+                    .Distinct().ToList();
+            <tr>
+                <td><strong>@submission.StudentName</strong><br /><small>@submission.Nim</small></td>
+                <td>@submission.ClassName / @submission.AttendanceNumber<br /><small>@submission.AssistantCode</small></td>
+                <td>@submission.Assignment.Code</td>
+                <td><span class="status status--@submission.Status.ToLowerInvariant()">@submission.Status</span></td>
+                <td>@(reasons.Count == 0 ? "-" : string.Join(", ", reasons))</td>
+                <td><a asp-page="Details" asp-route-id="@submission.Id">Detail</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

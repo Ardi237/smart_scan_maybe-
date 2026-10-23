@@ -1,0 +1,54 @@
+@page
+@model SmartScanner.Web.Pages.Assignments.IndexModel
+@{
+    ViewData["Title"] = "Assignment";
+}
+
+<section class="page-heading">
+    <p class="eyebrow">KATALOG ASSIGNMENT</p>
+    <h1>Assignment awal</h1>
+    <p>Data berikut dibaca dari SQLite dan menjadi konfigurasi awal SmartScanner.</p>
+</section>
+
+@if (Model.Assignments.Count == 0)
+{
+    <p class="empty-state">Belum ada assignment aktif.</p>
+}
+else
+{
+    <div class="assignment-list">
+        @foreach (var assignment in Model.Assignments)
+        {
+            <article class="assignment-card">
+                <div class="assignment-card__header">
+                    <div>
+                        <p class="code">@assignment.Code</p>
+                        <h2>@assignment.Name</h2>
+                    </div>
+                    <span class="status">@(assignment.IsActive ? "Aktif" : "Nonaktif")</span>
+                </div>
+
+                <dl class="details">
+                    <dt>Scanner profile</dt>
+                    <dd>@assignment.ScannerProfile</dd>
+                    <dt>Format filename</dt>
+                    <dd><code>@assignment.FilenamePattern</code></dd>
+                    <dt>Timeout</dt>
+                    <dd>Build @assignment.BuildTimeoutSeconds detik · Run @assignment.RunTimeoutSeconds detik</dd>
+                </dl>
+
+                <h3>Test case aktif (@assignment.TestCases.Count)</h3>
+                <ol class="test-case-list">
+                    @foreach (var testCase in assignment.TestCases.OrderBy(testCase => testCase.Sequence))
+                    {
+                        <li>
+                            <strong>@testCase.Name</strong>
+                            <span>Input: <code>@testCase.StandardInput.Replace("\n", " ↵ ")</code></span>
+                            <span>Expected: <code>@testCase.ExpectedValuesJson</code></span>
+                        </li>
+                    }
+                </ol>
+            </article>
+        }
+    </div>
+}

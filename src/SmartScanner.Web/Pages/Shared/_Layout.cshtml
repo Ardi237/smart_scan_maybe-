@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartScanner</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" asp-page="/Index">SmartScanner</a>
+        <nav>
+            <a asp-page="/Index">Beranda</a>
+            <a asp-page="/Assignments/Index">Assignment</a>
+            <a asp-page="/Submissions/Index">Submission</a>
+            <a asp-page="/Submissions/Create">Upload</a>
+            <a asp-page="/Settings/Index">Settings</a>
+        </nav>
+    </header>
+    <main class="page-content">
+        @RenderBody()
+    </main>
+</body>
+</html>

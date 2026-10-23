@@ -1,0 +1,23 @@
+@page
+@model SmartScanner.Web.Pages.IndexModel
+@{
+    ViewData["Title"] = "Beranda";
+}
+
+<section class="hero">
+    <p class="eyebrow">PRE-SCREENING SUBMISSION</p>
+    <h1>SmartScanner</h1>
+    <p>Memeriksa requirement objektif submission pemrograman sebelum penilaian manual.</p>
+    <a class="button" asp-page="/Assignments/Index">Lihat assignment awal</a>
+</section>
+
+<section class="card-grid">
+    <article class="card">
+        <h2>Scope MVP</h2>
+        <p>Hanya C# console dan ZIP. Hasil screening bukan nilai akademik.</p>
+    </article>
+    <article class="card">
+        <h2>Katalog awal</h2>
+        <p>Latihan 1 dan Jurnal 1 sudah tersimpan sebagai data awal di SQLite.</p>
+    </article>
+</section>

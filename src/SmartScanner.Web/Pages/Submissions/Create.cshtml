@@ -1,0 +1,53 @@
+@page
+@model SmartScanner.Web.Pages.Submissions.CreateModel
+@{
+    ViewData["Title"] = "Upload submission";
+}
+
+<section class="page-heading">
+    <p class="eyebrow">SUBMISSION BARU</p>
+    <h1>Upload dan pemeriksaan awal</h1>
+    <p>ZIP asli disimpan dengan ID internal. Pemeriksaan administratif berjalan setelah file diterima.</p>
+</section>
+
+<form method="post" enctype="multipart/form-data" class="upload-form">
+    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+    <label>
+        Assignment
+        <select asp-for="Input.AssignmentId">
+            <option value="">Pilih assignment</option>
+            @foreach (var assignment in Model.Assignments)
+            {
+                <option value="@assignment.Id">@assignment.Code — @assignment.Name</option>
+            }
+        </select>
+        <span asp-validation-for="Input.AssignmentId"></span>
+    </label>
+    <label>
+        Nama mahasiswa
+        <input asp-for="Input.StudentName" autocomplete="name" />
+        <span asp-validation-for="Input.StudentName"></span>
+    </label>
+    <label>
+        NIM
+        <input asp-for="Input.Nim" inputmode="numeric" />
+        <span asp-validation-for="Input.Nim"></span>
+    </label>
+    <label>
+        Kelas
+        <input asp-for="Input.ClassName" placeholder="IF-47-01" />
+        <span asp-validation-for="Input.ClassName"></span>
+    </label>
+    <label>
+        Nomor absen
+        <input asp-for="Input.AttendanceNumber" type="number" min="1" />
+        <span asp-validation-for="Input.AttendanceNumber"></span>
+        <small>Kode asisten ditentukan otomatis dari General Settings.</small>
+    </label>
+    <label>
+        File ZIP
+        <input asp-for="Input.Archive" accept=".zip,application/zip" />
+        <span asp-validation-for="Input.Archive"></span>
+    </label>
+    <button class="button" type="submit">Simpan dan periksa</button>
+</form>

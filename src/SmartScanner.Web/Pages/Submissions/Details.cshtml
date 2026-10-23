@@ -1,0 +1,100 @@
+@page "{id:guid}"
+@model SmartScanner.Web.Pages.Submissions.DetailsModel
+@{
+    ViewData["Title"] = "Detail submission";
+    var latestRun = Model.Submission.ScreeningRuns
+        .OrderByDescending(run => run.StartedAtUtc)
+        .FirstOrDefault();
+}
+
+<section class="page-heading">
+    <p class="eyebrow">SUBMISSION TERSIMPAN</p>
+    <h1>@Model.Submission.StudentName</h1>
+    <p>@Model.Submission.Assignment.Code · status <strong>@Model.Submission.Status</strong></p>
+</section>
+
+<section class="card details-card">
+    <dl class="details">
+        <dt>NIM</dt><dd>@Model.Submission.Nim</dd>
+        <dt>Kelas</dt><dd>@Model.Submission.ClassName</dd>
+        <dt>Nomor absen</dt><dd>@Model.Submission.AttendanceNumber</dd>
+        <dt>Kode asisten</dt><dd>@Model.Submission.AssistantCode</dd>
+        <dt>File asli</dt><dd>@Model.Submission.OriginalFileName</dd>
+        <dt>SHA-256</dt><dd><code>@Model.Submission.ArchiveSha256</code></dd>
+        <dt>Ukuran</dt><dd>@Model.Submission.ArchiveBytes byte</dd>
+        <dt>Diunggah</dt><dd>@Model.Submission.UploadedAtUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm")</dd>
+    </dl>
+</section>
+
+<form method="post" asp-page-handler="Recheck" asp-route-id="@Model.Submission.Id" class="inline-action">
+    <button class="button button--primary" type="submit">Periksa ulang</button>
+</form>
+
+<section class="page-heading screening-heading">
+    <p class="eyebrow">SCREENING RUN</p>
+    <h2>Hasil pemeriksaan submission</h2>
+</section>
+
+@if (latestRun is null)
+{
+    <p class="empty-state">Belum ada screening run.</p>
+}
+else
+{
+    <div class="check-list">
+        @foreach (var check in latestRun.CheckResults.OrderBy(check => check.Sequence))
+        {
+            <article class="check check--@check.Status.ToLowerInvariant()">
+                <div>
+                    <strong>@check.CheckCode</strong>
+                    <p>@check.Message</p>
+                    @if (!string.IsNullOrEmpty(check.ReasonCode))
+                    {
+                        <code>@check.ReasonCode</code>
+                    }
+                    @if (!string.IsNullOrEmpty(check.DetailsJson))
+                    {
+                        <details>
+                            <summary>Detail runner</summary>
+                            <code>@check.DetailsJson</code>
+                        </details>
+                    }
+                </div>
+                <span>@check.Status</span>
+            </article>
+        }
+    </div>
+}
+
+<section class="page-heading screening-heading">
+    <p class="eyebrow">FUNCTIONAL TEST</p>
+    <h2>Hasil pengujian program</h2>
+</section>
+
+@if (latestRun is null || latestRun.FunctionalTestResults.Count == 0)
+{
+    <p class="empty-state">Tidak ada functional test yang dijalankan pada run ini.</p>
+}
+else
+{
+    <div class="functional-list">
+        @foreach (var test in latestRun.FunctionalTestResults.OrderBy(test => test.Sequence))
+        {
+            <article class="functional-card check--@test.Status.ToLowerInvariant()">
+                <header><strong>@test.TestCase.Name</strong><span>@test.Status</span></header>
+                @if (!string.IsNullOrEmpty(test.ReasonCode)) { <code>@test.ReasonCode</code> }
+                <dl class="details compact-details">
+                    <dt>Input</dt><dd><pre>@test.StandardInput</pre></dd>
+                    <dt>Expected</dt><dd><code>@test.ExpectedValuesJson</code></dd>
+                    <dt>Actual</dt><dd><code>@(test.ActualValuesJson ?? "-")</code></dd>
+                    <dt>Exit / timeout</dt><dd>@(test.ExitCode?.ToString() ?? "-") / @test.TimedOut</dd>
+                    <dt>Durasi</dt><dd>@test.DurationMilliseconds ms</dd>
+                    <dt>stdout</dt><dd><pre>@test.StandardOutput</pre></dd>
+                    <dt>stderr</dt><dd><pre>@test.StandardError</pre></dd>
+                </dl>
+            </article>
+        }
+    </div>
+}
+
+<p><a asp-page="Create">Upload submission lain</a></p>
